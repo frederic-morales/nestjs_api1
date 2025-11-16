@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './user.dto';
@@ -25,7 +25,12 @@ export class UsersService {
   }
 
   async create(body: CreateUserDto) {
-    const newUser = await this.usersRepository.save(body)
+     try {
+      const newUser = await this.usersRepository.save(body);
+      return newUser;
+    } catch {
+      throw new BadRequestException('Error creating user');
+    }
   }
 
   async update(id: number, changes: UpdateUserDto) {
@@ -41,7 +46,6 @@ export class UsersService {
   }
 
   private async findOne(id: number) {
-    // const position = this.users.findIndex((user) => user.id === id);
     const user = await this.usersRepository.findOneBy({id})
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);

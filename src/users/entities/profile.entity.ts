@@ -1,5 +1,9 @@
 import { Entity, UpdateDateColumn, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
+@Entity({
+  name: 'profiles',
+})
+
 export class Profile {
   @PrimaryGeneratedColumn()
   id: number;
@@ -10,7 +14,7 @@ export class Profile {
   @Column({ type: 'varchar', length: 255, name: 'last_name' })
   lastName: string;
 
-  @Column({ type: 'text', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   avatar: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', name: 'created_at' })
