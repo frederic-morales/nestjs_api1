@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserDto, UpdateUserDto } from './user.dto';
+import { CreateUserDto, UpdateUserDto } from './dtos/user.dto';
 import { User } from './entities/user.entity';
 import { Profile } from './entities/profile.entity';
 
@@ -10,13 +10,12 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-
-    @InjectRepository(Profile)
-    private profileRepository: Repository<Profile>
   ) {}
 
   async findAll() {
-    const users = await this.usersRepository.find();
+    const users = await this.usersRepository.find({
+      relations: ['profile'],
+    });
     return users
   }
 
@@ -25,11 +24,12 @@ export class UsersService {
     if (user.id === 1) {
       throw new ForbiddenException('You are not allowed to access this user')
     }
-    const userProfile = await this.findUserProfile(user?.profile?.id)
-    return {
-      ...user,
-      profile: userProfile
-    };
+    return user;
+  }
+
+  async getProfileByUserId(id: number){
+    const user = await this.findOne(id);
+    return user.profile
   }
 
   async create(body: CreateUserDto) {
@@ -42,30 +42,43 @@ export class UsersService {
   }
 
   async update(id: number, changes: UpdateUserDto) {
-    const user = await this.findOne(id);
-    const updatedUser = this.usersRepository.merge(user, changes)
-    return this.usersRepository.save(updatedUser);    
+    try {
+      const user = await this.findOne(id);
+      console.log(changes);
+      const updatedUser = this.usersRepository.merge(user, changes)
+      console.log(updatedUser);
+      const saveUser = await this.usersRepository.save(updatedUser);
+      return saveUser;
+    } catch (error) {
+      throw new BadRequestException("Error updating user")
+    }
   }
 
   async delete(id: number) {
-    const user = await this.findOne(id);
-    await this.usersRepository.delete(user.id)
-    return { message: 'User deleted' };
+    try {
+      await this.usersRepository.delete(id)
+      return { message: 'User deleted' };
+    } catch (error) {
+      throw new BadRequestException('Error deleting user')
+    }
   }
 
   private async findOne(id: number) {
-    const user = await this.usersRepository.findOneBy({id})
+    const user = await this.usersRepository.findOne({
+      where: {id},
+      relations: ['profile']
+    })
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
     return user;
   }
 
-  private async findUserProfile(id: number){
-    const profile = await this.profileRepository.findOneBy({id})
-    if (!profile) {
-      throw new NotFoundException(`Profile with id ${id} not found`)
-    }
-    return profile;
-  }
+  // private async findUserProfile(id: number){
+  //   const profile = await this.profileRepository.findOneBy({id})
+  //   if (!profile) {
+  //     throw new NotFoundException(`Profile with id ${id} not found`)
+  //   }
+  //   return profile;
+  // }
 }
