@@ -16,10 +16,10 @@ export class User {
   password: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', name: 'created_at', })
-  createdAt: string;
+  createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', name: 'updated_at', })
-  updatedAt: string;
+  updatedAt: Date;
 
   @OneToOne(() => Profile, {nullable: false, cascade: true})
   @JoinColumn({name: 'profile_id'})
