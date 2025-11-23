@@ -9,7 +9,7 @@ import { Post } from '../entities/post.entity';
 export class PostsService {
   constructor(
     @InjectRepository(Post)
-    private postsRepository: Repository<Post>,
+    private readonly postsRepository: Repository<Post>,
   ) {}
 
   async findAll() {
@@ -61,5 +61,13 @@ export class PostsService {
     } catch (error) {
       throw new BadRequestException('Error deleting post');
     }
+  }
+
+  async getPostsByCategoryId(categoryId: number){
+    const posts = await this.postsRepository.find({
+      where: {categories: {id: categoryId}},
+      relations: ['user.profile'],
+    });
+    return posts;
   }
 }
