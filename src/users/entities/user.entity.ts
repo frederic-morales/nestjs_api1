@@ -2,6 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { Profile } from './profile.entity';
 import * as bcrypt from 'bcrypt';
 import { Post } from '../../posts/entities/post.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({
   name: 'users',
@@ -15,6 +16,7 @@ export class User {
   email: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', name: 'created_at', })
