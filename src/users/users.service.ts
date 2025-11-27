@@ -83,11 +83,10 @@ export class UsersService {
     return user;
   }
 
-  // private async findUserProfile(id: number){
-  //   const profile = await this.profileRepository.findOneBy({id})
-  //   if (!profile) {
-  //     throw new NotFoundException(`Profile with id ${id} not found`)
-  //   }
-  //   return profile;
-  // }
+  async getUserByEmail(email: string){
+    const user = await this.usersRepository.findOne({
+      where: {email}
+    })
+    return user;
+  }
 }
