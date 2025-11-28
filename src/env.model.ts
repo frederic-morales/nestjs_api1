@@ -6,4 +6,5 @@ export class EnvModel {
   POSTGRES_DB: string;
   POSTGRES_USER: string;
   POSTGRES_PASSWORD: string;
+  JWT_SECRET: string;
 }
