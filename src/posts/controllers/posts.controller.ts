@@ -13,8 +13,6 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @UseGuards(AuthGuard('jwt'))
-
-    
   @Post()
   create(@Body() createPostDto: CreatePostDto, @Req() req: Request) {
     const payload = req.user as Payload;
@@ -32,9 +30,18 @@ export class PostsController {
     return this.postsService.findOne(id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.update(id, updatePostDto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Put(':id/publish')
+  publish(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+    const payload = req.user as Payload;
+    const userId = payload.sub;
+    return this.postsService.publish(id, userId);
   }
 
   @Delete(':id')
