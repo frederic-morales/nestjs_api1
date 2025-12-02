@@ -4,6 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EnvModel } from 'src/env.model';
 
+import { Payload } from '../models/payload.model';
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(configService: ConfigService<EnvModel>) {
@@ -20,7 +22,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  validate(payload: {sub: string}) {
-    return { userId: payload.sub };
+  // validate(payload: {sub: string}) {
+  //   return { userId: payload.sub };
+  // }
+
+  validate(payload: Payload) {
+    return payload; 
   }
 }
